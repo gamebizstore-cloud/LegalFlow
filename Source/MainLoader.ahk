@@ -8,7 +8,7 @@ CurrentVersion := "1.0.5"
 ; ÖNEMLİ: Buraya kendi config.ini dosyanızın RAW (Ham) linkini yapıştırın.
 ; Test aşamasında yerel dosya yolu da verebilirsiniz (örn: "C:\Temp\config.ini")
 ; Satış yaparken burası "https://raw.githubusercontent.com/..." gibi olmalı.
-ServerConfigURL := "https://raw.githubusercontent.com/KULLANICIADI/REPO/main/config.ini" 
+ServerConfigURL := "https://raw.githubusercontent.com/gamebizstore-cloud/LegalFlow/refs/heads/main/ServerFiles/config.ini" 
 
 ; Uygulamanın çalışacağı ve dosyaları indireceği klasör
 LocalMacroDir := A_AppData . "\HukukAsistani\Makrolar"
