@@ -72,7 +72,9 @@ LV.ModifyCol(2, 100)
 LV.ModifyCol(3, 150)
 LV.ModifyCol(4, 150)
 
-; --- 5. ADIM: MODÜLLERİ İŞLEME ---
+; ...existing code...
+
+; --- 5. ADIM: MODÜLLERİ İŞLEME (DÜZELTİLMİŞ) ---
 try {
     Section := IniRead(ServerDataFile, "Moduller")
 } catch {
@@ -80,14 +82,22 @@ try {
 }
 
 if (Section = "") {
-    LV.Add(, "Veri Yok", "-", "Sunucuda modül tanımı yok", "-")
+    LV.Add(, "Veri Yok", "-", "Sunucuda modül tanımı okunmadı", "-")
 } else {
     Loop Parse, Section, "`n", "`r" {
         if (A_LoopField = "")
             continue
             
-        ModuleName := A_LoopField
-        RawData := IniRead(ServerDataFile, "Moduller", ModuleName, "")
+        ; HATANIN ÇÖZÜMÜ BURADA:
+        ; Satırı eşittir işaretinden ikiye bölüyoruz.
+        ; Sol taraf = Modül Adı, Sağ Taraf = Veriler
+        SplitLine := StrSplit(A_LoopField, "=", , 2)
+        
+        if (SplitLine.Length < 2)
+            continue
+            
+        ModuleName := SplitLine[1]
+        RawData := SplitLine[2]
         
         ; INI Formatı: Versiyon|Aktiflik|Link
         Split := StrSplit(RawData, "|")
@@ -102,14 +112,12 @@ if (Section = "") {
             
             if (IsActive = "0") {
                 Status := "DEAKTİF (Yönetici)"
-                ; Güvenlik gereği, deaktif modül yerelde varsa bile çalıştırılmaz.
             } else {
                 ; Güncelleme Gerekli mi?
                 NeedUpdate := true
                 if FileExist(LocalPath) {
                     try {
                         LocalContent := FileRead(LocalPath)
-                        ; İndirilen dosyanın içinde "; VER:1.2" gibi bir satır arar
                         if InStr(LocalContent, "; VER:" . ServerVer)
                             NeedUpdate := false
                     }
@@ -117,15 +125,21 @@ if (Section = "") {
                 
                 if (NeedUpdate) {
                     Status := "İndiriliyor..."
-                    LV.Modify(LV.GetCount() + 1, , ModuleName, ServerVer, Status, "Bekleniyor") 
+                    ; Listeye ekle ki kullanıcı görsün
+                    RowNumber := LV.Add(, ModuleName, ServerVer, Status, "Bekleniyor")
+                    
                     try {
                         Download(DownloadUrl, LocalPath)
                         Status := "Güncellendi & Hazır"
+                        ; Listeyi güncelle
+                        LV.Modify(RowNumber, , ModuleName, ServerVer, Status, "Otomatik")
                     } catch as e {
                         Status := "İndirme Başarısız"
+                        LV.Modify(RowNumber, , ModuleName, ServerVer, Status, "Hata")
                     }
                 } else {
                     Status := "Güncel"
+                    LV.Add(, ModuleName, ServerVer, Status, "Otomatik")
                 }
                 
                 ; Scripti Çalıştır
@@ -133,15 +147,12 @@ if (Section = "") {
                     if FileExist(LocalPath) {
                         try {
                             Run(LocalPath)
-                            Status .= " (Çalışıyor)"
-                        } catch {
-                            Status .= " (Başlatılamadı)"
+                            ; Listede durum güncelle
+                            LV.Modify(LV.GetCount(), , , , Status . " (Çalışıyor)")
                         }
                     }
                 }
             }
-            
-            LV.Add(, ModuleName, ServerVer, Status, "Otomatik")
         }
     }
 }
@@ -199,4 +210,5 @@ GetServerConfig(url) {
         return ""
     }
 }
+
 
