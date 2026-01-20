@@ -181,10 +181,10 @@ GetServerConfig(url) {
     try {
         req := ComObject("WinHttp.WinHttpRequest.5.1")
         
-        ; --- HİLE BURADA: ---
-        ; Linkin sonuna "?t=" ve bilgisayarın çalışma süresini (milisaniye) ekliyoruz.
-        ; Böylece GitHub "Bu yeni bir istek" diyerek en güncel dosyayı veriyor.
-        req.Open("GET", url . "?t=" . A_TickCount, true)
+        ; DÜZELTİLMİŞ HALİ:
+        ; URL'in sonuna "?nocache=123456" gibi sürekli değişen bir sayı ekler.
+        ; Bu sayede GitHub "Bu yeni bir istek" der ve en güncel dosyayı gönderir.
+        req.Open("GET", url . "?nocache=" . A_TickCount, true)
         
         req.Send()
         req.WaitForResponse()
@@ -199,3 +199,4 @@ GetServerConfig(url) {
         return ""
     }
 }
+
