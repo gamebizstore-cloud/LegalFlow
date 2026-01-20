@@ -180,7 +180,12 @@ GetServerConfig(url) {
         
     try {
         req := ComObject("WinHttp.WinHttpRequest.5.1")
-        req.Open("GET", url, true)
+        
+        ; --- HİLE BURADA: ---
+        ; Linkin sonuna "?t=" ve bilgisayarın çalışma süresini (milisaniye) ekliyoruz.
+        ; Böylece GitHub "Bu yeni bir istek" diyerek en güncel dosyayı veriyor.
+        req.Open("GET", url . "?t=" . A_TickCount, true)
+        
         req.Send()
         req.WaitForResponse()
         
@@ -188,7 +193,6 @@ GetServerConfig(url) {
             return ""
             
         ResponseText := req.ResponseText
-        ; UTF-8 kodlamasıyla kaydet
         FileAppend(ResponseText, TempFile, "UTF-8") 
         return TempFile
     } catch {
