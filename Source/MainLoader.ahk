@@ -177,21 +177,14 @@ GetServerConfig(url) {
         req.Open("GET", url . "?nocache=" . A_TickCount, true)
         req.Send()
         req.WaitForResponse()
-        
-        if (req.Status != 200) {
-            MsgBox("Sunucu Hatası Kodu: " . req.Status . "`nLink: " . url, "Hata", 16)
+        if (req.Status != 200)
             return ""
-        }
-            
         TempFile := A_Temp . "\temp_hukuk_config.ini"
         if FileExist(TempFile)
-            try FileDelete(TempFile)
-        
+            FileDelete(TempFile)
         FileAppend(req.ResponseText, TempFile, "UTF-8")
         return TempFile
-    } catch as e {
-        MsgBox("Bağlantı Hatası Detayı:`n" . e.Message . "`n`nUrl: " . url, "Kritik Hata", 16)
+    } catch {
         return ""
     }
 }
-
