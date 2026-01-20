@@ -6,7 +6,7 @@ AppName := "LegalFlow"
 CurrentVersion := "1.0.0" ; Versiyonu güncelledik
 
 ; GitHub'daki config dosyanızın RAW linki buraya:
-ServerConfigURL := "https://raw.githubusercontent.com/KULLANICIADI/REPO/main/config.ini" 
+ServerConfigURL := "https://raw.githubusercontent.com/gamebizstore-cloud/LegalFlow/refs/heads/main/ServerFiles/config.ini" 
 
 LocalMacroDir := A_AppData . "\HukukAsistani\Makrolar"
 if !DirExist(LocalMacroDir)
@@ -194,4 +194,5 @@ GetServerConfig(url) {
         return ""
     }
 }
+
 
